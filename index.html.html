@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoreo Fenológico - Geoportal Huasco</title>
+  <style>
+    /* Reset básico para integración perfecta en iframe */
+    html, body {
+      margin: 0;
+      padding: 12px;
+      background: transparent;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* ============================================================
+       WIDGET CSS COMPLETO
+       ============================================================ */
+    .df-widget-root {
+      --df-bg-main: #F8FAFC;
+      --df-card-bg: #FFFFFF;
+      --df-border: #E2E8F0;
+      --df-border-active: #CBD5E1;
+      --df-text-main: #0F172A;
+      --df-text-sub: #475569;
+      --df-text-muted: #94A3B8;
+      --df-gold-primary: #EAB308;
+      --df-gold-light: #FEF9C3;
+      --df-ruby-primary: #E11D48;
+      --df-ruby-light: #FFE4E6;
+      --df-green-stem: #16A34A;
+      --df-emerald-live: #10B981;
+      --df-sky-blue: #0284C7;
+
+      box-sizing: border-box;
+      background-color: var(--df-bg-main);
+      border-radius: 16px;
+      border: 1px solid var(--df-border);
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+      padding: clamp(18px, 2.5vw, 28px);
+      max-width: 1040px;
+      margin: 0 auto;
+      color: var(--df-text-main);
+    }
+
+    .df-widget-root *, .df-widget-root *::before, .df-widget-root *::after {
+      box-sizing: border-box;
+    }
+
+    /* Header Atardecer Atacameño */
+    .df-header-bar {
+      background: linear-gradient(135deg, #1E1B2E 0%, #3B152B 35%, #701A39 70%, #C2410C 100%);
+      border-radius: 12px;
+      padding: clamp(20px, 2.8vw, 26px);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 12px 28px -6px rgba(59, 21, 43, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .df-header-bar::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(251, 146, 60, 0.28) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .df-header-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .df-header-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(4px);
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFEDD5;
+      flex-shrink: 0;
+    }
+
+    .df-header-icon svg { width: 24px; height: 24px; }
+
+    .df-header-tag {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      color: #FDBA74;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+      display: block;
+    }
+
+    .df-header-title h2 {
+      font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+      font-weight: 800;
+      color: #FFFFFF;
+      margin: 0;
+      letter-spacing: -0.3px;
+      text-transform: uppercase;
+    }
+
+    .df-header-sub {
+      font-size: 0.8rem;
+      color: #E2E8F0;
+      font-weight: 500;
+      margin-top: 3px;
+      opacity: 0.9;
+    }
+
+    .df-live-badge {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .df-pulse-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--df-emerald-live);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8);
+      animation: df-live-pulse 1.8s infinite ease-out;
+    }
+
+    @keyframes df-live-pulse {
+      0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8); }
+      70% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Barra Microclima */
+    .df-weather-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      background: #F1F5F9;
+      border: 1px solid var(--df-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+    }
+
+    .df-weather-metric {
+      background: #FFFFFF;
+      border: 1px solid var(--df-border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .df-weather-icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .df-weather-icon-box--fog { background: #E0F2FE; color: #0284C7; border: 1px solid rgba(2, 132, 199, 0.2); }
+    .df-weather-icon-box--uv { background: #FEF3C7; color: #D97706; border: 1px solid rgba(217, 119, 6, 0.2); }
+    .df-weather-icon-box--temp { background: #ECFDF5; color: #059669; border: 1px solid rgba(5, 150, 105, 0.2); }
+
+    .df-weather-details { display: flex; flex-direction: column; gap: 1px; }
+    .df-weather-label { font-size: 0.68rem; font-weight: 700; color: var(--df-text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .df-weather-value { font-size: 0.85rem; font-weight: 800; color: var(--df-text-main); }
+    .df-weather-value span { font-size: 0.72rem; font-weight: 600; color: var(--df-text-sub); }
+
+    .df-weather-status-chip {
+      margin-left: auto;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .df-weather-status-chip--optimal { background: #ECFDF5; color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .df-weather-status-chip--camanchaca { background: #E0F2FE; color: var(--df-sky-blue); border: 1px solid rgba(2, 132, 199, 0.3); }
+
+    /* Grilla & Cards */
+    .df-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(16px, 2vw, 24px); }
+    @media (max-width: 768px) { .df-grid { grid-template-columns: 1fr; } }
+
+    .df-card {
+      background: var(--df-card-bg);
+      border: 1px solid var(--df-border);
+      border-radius: 12px;
+      padding: clamp(18px, 2vw, 22px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .df-card:hover { transform: translateY(-3px); border-color: var(--df-border-active); box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.08); }
+    .df-card--anan:hover { border-color: rgba(234, 179, 8, 0.5); }
+    .df-card--garra:hover { border-color: rgba(225, 29, 72, 0.5); }
+
+    .df-stage-stepper {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      background: #F1F5F9;
+      padding: 4px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      border: 1px solid var(--df-border);
+    }
+
+    .df-stage-step { font-size: 0.68rem; font-weight: 600; color: var(--df-text-muted); text-align: center; padding: 6px 2px; border-radius: 6px; white-space: nowrap; }
+    .df-stage-step.active { background: #FFFFFF; font-weight: 800; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+    .df-stage-step.active--anan { color: #D97706; border: 1px solid rgba(217, 119, 6, 0.25); }
+    .df-stage-step.active--garra { color: var(--df-ruby-primary); border: 1px solid rgba(225, 29, 72, 0.25); }
+
+    .df-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+    .df-common-name { font-size: 1.2rem; font-weight: 800; color: var(--df-text-main); margin: 0; letter-spacing: -0.3px; }
+    .df-scientific-name { font-style: italic; font-size: 0.8rem; color: var(--df-text-sub); margin-top: 1px; display: block; }
+
+    .df-badge { font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
+    .df-badge--anan { background: var(--df-gold-light); color: #B45309; border: 1px solid rgba(234, 179, 8, 0.3); }
+    .df-badge--garra { background: var(--df-ruby-light); color: var(--df-ruby-primary); border: 1px solid rgba(225, 29, 72, 0.3); }
+
+    .df-illustration-frame {
+      background: #F8FAFC;
+      border: 1px solid var(--df-border);
+      border-radius: 8px;
+      height: 185px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+      padding: 8px;
+    }
+
+    .df-illustration-frame svg { height: 100%; width: auto; max-width: 100%; }
+
+    .df-sway-anim {
+      transform-origin: 50% 98%;
+      animation: df-sway 4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+    }
+
+    @keyframes df-sway {
+      0% { transform: rotate(-3.5deg) translateX(-2px); }
+      100% { transform: rotate(3.5deg) translateX(2px); }
+    }
+
+    .df-progress-section { margin-top: 4px; }
+    .df-progress-header { display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; color: var(--df-text-sub); margin-bottom: 6px; }
+    .df-progress-track { width: 100%; height: 8px; border-radius: 4px; background: #E2E8F0; overflow: hidden; position: relative; }
+    .df-progress-fill { height: 100%; border-radius: 4px; position: relative; overflow: hidden; }
+
+    .df-progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+      animation: df-shimmer 2.2s infinite;
+    }
+
+    @keyframes df-shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .df-progress-fill--anan { width: 82%; background: linear-gradient(90deg, #F59E0B, #EAB308); }
+    .df-progress-fill--garra { width: 34%; background: linear-gradient(90deg, #BE123C, #E11D48); }
+
+    .df-status-note { font-size: 0.78rem; line-height: 1.45; color: var(--df-text-sub); margin: 12px 0 0 0; }
+    .df-status-note strong { color: var(--df-text-main); }
+  </style>
+</head>
+<body>
+
+  <div class="df-widget-root">
+
+    <!-- HEADER ATARDECER ATACAMEÑO -->
+    <div class="df-header-bar">
+      <div class="df-header-title">
+        <div class="df-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 2a4 4 0 0 0-4 4c0 2 2 4 4 6 2-2 4-4 4-6a4 4 0 0 0-4-4z"/>
+            <path d="M12 22a4 4 0 0 0 4-4c0-2-2-4-4-6-2 2-4 4-4 6a4 4 0 0 0 4 4z"/>
+            <path d="M22 12a4 4 0 0 0-4-4c-2 0-4 2-6 4 2 2 4 4 6 4a4 4 0 0 0 4-4z"/>
+            <path d="M2 12a4 4 0 0 0 4 4c2 0 4-2 6-4-2-2-4-4-6-4a4 4 0 0 0-4 4z"/>
+          </svg>
+        </div>
+        <div>
+          <span class="df-header-tag">Ilustre Municipalidad de Huasco · DIMAO</span>
+          <h2>Estado de Floración Ecosistémica</h2>
+          <div class="df-header-sub">Geoportal Huasco · Monitoreo Fenológico Territorial</div>
+        </div>
+      </div>
+      <div class="df-live-badge">
+        <span class="df-pulse-dot"></span> EN TIEMPO REAL
+      </div>
+    </div>
+
+    <!-- MINI BARRA DE MICROCLIMA -->
+    <div class="df-weather-bar">
+      <div class="df-weather-metric">
+        <div class="df-weather-icon-box df-weather-icon-box--fog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 14h16"/><path d="M4 18h16"/><path d="M4 10h16"/><path d="M6 6h12"/>
+          </svg>
+        </div>
+        <div class="df-weather-details">
+          <span class="df-weather-label">Humedad / Camanchaca</span>
+          <div class="df-weather-value">84% <span>(Alta)</span></div>
+        </div>
+        <span class="df-weather-status-chip df-weather-status-chip--camanchaca">Niebla Activa</span>
+      </div>
+
+      <div class="df-weather-metric">
+        <div class="df-weather-icon-box df-weather-icon-box--uv">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+        </div>
+        <div class="df-weather-details">
+          <span class="df-weather-label">Radiación UV / Sol</span>
+          <div class="df-weather-value">Índice 8 <span>(Alto)</span></div>
+        </div>
+        <span class="df-weather-status-chip df-weather-status-chip--optimal">Apertura Óptima</span>
+      </div>
+
+      <div class="df-weather-metric">
+        <div class="df-weather-icon-box df-weather-icon-box--temp">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+          </svg>
+        </div>
+        <div class="df-weather-details">
+          <span class="df-weather-label">Temp. / Sustrato</span>
+          <div class="df-weather-value">18.5 °C <span>(SO 12 km/h)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRILLA ESPECIES -->
+    <div class="df-grid">
+      <!-- TARJETA AÑAÑUCA -->
+      <article class="df-card df-card--anan">
+        <div>
+          <div class="df-stage-stepper">
+            <span class="df-stage-step">1. Latencia</span>
+            <span class="df-stage-step">2. Brote</span>
+            <span class="df-stage-step active active--anan">3. Flor Abierta ★</span>
+            <span class="df-stage-step">4. Semilla</span>
+          </div>
+          <div class="df-card-head">
+            <div>
+              <h3 class="df-common-name">Añañuca Amarilla</h3>
+              <span class="df-scientific-name">Rhodophiala bagnoldii</span>
+            </div>
+            <span class="df-badge df-badge--anan">Plena Floración</span>
+          </div>
+          <div class="df-illustration-frame">
+            <svg class="df-sway-anim" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="100" cy="198" rx="45" ry="5" fill="#E2E8F0" opacity="0.7"/>
+              <path d="M 100 198 Q 98 140 100 95" stroke="#16A34A" stroke-width="7" fill="none" stroke-linecap="round"/>
+              <path d="M 99 198 Q 97 140 99 95" stroke="#15803D" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M 95 195 Q 55 155 30 135 C 55 168 88 188 95 195 Z" fill="#15803D"/>
+              <path d="M 105 195 Q 145 155 170 135 C 145 168 112 188 105 195 Z" fill="#166534"/>
+              <path d="M 98 196 Q 72 165 52 148 C 70 172 90 188 98 196 Z" fill="#22C55E"/>
+              <path d="M 102 196 Q 128 165 148 148 C 130 172 110 188 102 196 Z" fill="#15803D"/>
+              <path d="M 90 100 C 85 86, 115 86, 110 100 Z" fill="#15803D"/>
+              <path d="M 96 95 Q 68 78 50 64" stroke="#16A34A" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+              <path d="M 98 95 Q 84 68 76 50" stroke="#16A34A" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+              <path d="M 100 95 Q 100 65 100 44" stroke="#16A34A" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M 102 95 Q 116 68 124 50" stroke="#16A34A" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+              <path d="M 104 95 Q 132 78 150 64" stroke="#16A34A" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+              <g transform="translate(50, 64) rotate(-32)">
+                <path d="M 0 0 C -14 -14, -24 -28, -15 -38 C -4 -32, 0 -14, 0 0 Z" fill="#D97706"/>
+                <path d="M 0 0 C 14 -12, 22 -24, 16 -34 C 6 -30, 0 -12, 0 0 Z" fill="#F59E0B"/>
+                <path d="M 0 0 C -3 -15, -3 -28, 1 -38 C 5 -28, 2 -15, 0 0 Z" fill="#FEF08A"/>
+                <circle cx="-5" cy="-18" r="1.8" fill="#FEF08A"/>
+              </g>
+              <g transform="translate(76, 50) rotate(-16)">
+                <path d="M 0 0 C -13 -14, -22 -30, -13 -40 C -2 -32, 0 -14, 0 0 Z" fill="#D97706"/>
+                <path d="M 0 0 C 13 -12, 20 -24, 15 -34 C 5 -28, 0 -12, 0 0 Z" fill="#F59E0B"/>
+                <circle cx="-4" cy="-20" r="1.8" fill="#FEF08A"/>
+              </g>
+              <g transform="translate(100, 44)">
+                <path d="M 0 0 C -15 -16, -16 -38, 0 -46 C 16 -38, 15 -16, 0 0 Z" fill="#D97706"/>
+                <path d="M 0 0 C -22 -10, -38 -18, -38 -6 C -30 6, -15 6, 0 0 Z" fill="#F59E0B"/>
+                <path d="M 0 0 C 22 -10, 38 -18, 38 -6 C 30 6, 15 6, 0 0 Z" fill="#F59E0B"/>
+                <path d="M 0 0 C -14 10, -26 24, -20 32 C -10 28, -4 14, 0 0 Z" fill="#EAB308"/>
+                <path d="M 0 0 C 14 10, 26 24, 20 32 C 10 28, 4 14, 0 0 Z" fill="#EAB308"/>
+                <circle cx="0" cy="0" r="5" fill="#FEF08A"/>
+                <circle cx="-4" cy="-12" r="1.8" fill="#FEF08A"/>
+                <circle cx="4" cy="-12" r="1.8" fill="#FEF08A"/>
+              </g>
+              <g transform="translate(124, 50) rotate(16)">
+                <path d="M 0 0 C 13 -14, 22 -30, 13 -40 C 2 -32, 0 -14, 0 0 Z" fill="#D97706"/>
+                <path d="M 0 0 C -13 -12, -20 -24, -15 -34 C -5 -28, 0 -12, 0 0 Z" fill="#F59E0B"/>
+                <circle cx="4" cy="-20" r="1.8" fill="#FEF08A"/>
+              </g>
+              <g transform="translate(150, 64) rotate(32)">
+                <path d="M 0 0 C 14 -14, 24 -28, 15 -38 C 4 -32, 0 -14, 0 0 Z" fill="#D97706"/>
+                <path d="M 0 0 C -14 -12, -22 -24, -16 -34 C -6 -30, 0 -12, 0 0 Z" fill="#F59E0B"/>
+                <circle cx="5" cy="-18" r="1.8" fill="#FEF08A"/>
+              </g>
+            </svg>
+          </div>
+          <div class="df-progress-section">
+            <div class="df-progress-header">
+              <span>Apertura del Manto Floral</span>
+              <span style="color: #D97706;">82%</span>
+            </div>
+            <div class="df-progress-track">
+              <div class="df-progress-fill df-progress-fill--anan"></div>
+            </div>
+          </div>
+          <p class="df-status-note">
+            <strong>Punto Máximo Registrado:</strong> Manto amarillo denso y abierto en los llanos del territorio municipal.
+          </p>
+        </div>
+      </article>
+
+      <!-- TARJETA GARRA DE LEÓN -->
+      <article class="df-card df-card--garra">
+        <div>
+          <div class="df-stage-stepper">
+            <span class="df-stage-step">1. Latencia</span>
+            <span class="df-stage-step active active--garra">2. Brote Rojo ★</span>
+            <span class="df-stage-step">3. Floración</span>
+            <span class="df-stage-step">4. Semilla</span>
+          </div>
+          <div class="df-card-head">
+            <div>
+              <h3 class="df-common-name">Garra de León</h3>
+              <span class="df-scientific-name">Bomarea ovallei</span>
+            </div>
+            <span class="df-badge df-badge--garra">Brote Inicial</span>
+          </div>
+          <div class="df-illustration-frame">
+            <svg class="df-sway-anim" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="100" cy="198" rx="60" ry="5" fill="#E2E8F0" opacity="0.7"/>
+              <path d="M 25 135 Q 85 140 135 136 Q 160 132 168 110" stroke="#16A34A" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+              <path d="M 40 134 C 28 152, 35 168, 48 174 C 55 160, 52 142, 48 134 Z" fill="#15803D"/>
+              <path d="M 75 136 C 65 155, 72 172, 85 180 C 92 164, 88 144, 83 136 Z" fill="#15803D"/>
+              <path d="M 35 132 C 22 108, 35 82, 50 72 C 60 88, 52 110, 45 132 Z" fill="#22C55E"/>
+              <path d="M 68 134 C 55 104, 70 76, 85 64 C 95 82, 86 110, 78 134 Z" fill="#22C55E"/>
+              <path d="M 105 135 C 95 108, 108 80, 122 70 C 130 88, 122 110, 115 135 Z" fill="#22C55E"/>
+              <path d="M 138 134 C 130 112, 140 90, 150 80 C 158 94, 150 114, 146 134 Z" fill="#22C55E"/>
+              <g transform="translate(168, 110)">
+                <ellipse cx="-2" cy="10" rx="9" ry="5" fill="#15803D"/>
+                <path d="M -12 5 C -18 -5, -10 -16, -2 -22 C 3 -12, -3 2, -6 10 Z" fill="#BE123C"/>
+                <path d="M 6 5 C 12 -5, 6 -16, -2 -22 C -7 -12, -1 2, 2 10 Z" fill="#BE123C"/>
+                <circle cx="-8" cy="-8" r="7" fill="#881337"/>
+                <circle cx="5" cy="-8" r="7" fill="#881337"/>
+                <circle cx="-1" cy="-16" r="8" fill="#E11D48"/>
+                <circle cx="-1" cy="-5" r="9" fill="#E11D48"/>
+                <path d="M -1 -16 C -4 -8, -3 0, -1 4" stroke="#FDA4AF" stroke-width="1.2" fill="none"/>
+              </g>
+            </svg>
+          </div>
+          <div class="df-progress-section">
+            <div class="df-progress-header">
+              <span>Desarrollo de Capullo</span>
+              <span style="color: var(--df-ruby-primary);">34%</span>
+            </div>
+            <div class="df-progress-track">
+              <div class="df-progress-fill df-progress-fill--garra"></div>
+            </div>
+          </div>
+          <p class="df-status-note">
+            <strong>Fase de Capullo Naciente:</strong> Concentración de botones rojos resguardados en laderas de quebradas.
+          </p>
+        </div>
+      </article>
+    </div>
+
+  </div>
+
+</body>
+</html>
