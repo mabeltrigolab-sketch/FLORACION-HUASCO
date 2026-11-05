@@ -150,7 +150,7 @@
     100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
   }
 
-  /* ================= BARRA MICROCLIMA ================= */
+  /* ================= BARRA MICROCLIMA (NOVIEMBRE) ================= */
   .df-weather-bar {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -185,7 +185,7 @@
 
   .df-weather-icon-box--fog { background: #E0F2FE; color: #0284C7; border: 1px solid rgba(2, 132, 199, 0.2); }
   .df-weather-icon-box--uv { background: #FEF3C7; color: #D97706; border: 1px solid rgba(217, 119, 6, 0.2); }
-  .df-weather-icon-box--temp { background: #ECFDF5; color: #059669; border: 1px solid rgba(5, 150, 105, 0.2); }
+  .df-weather-icon-box--temp { background: #FEF2F2; color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.2); }
 
   .df-weather-details { display: flex; flex-direction: column; gap: 0px; }
   .df-weather-label { font-size: 0.63rem; font-weight: 700; color: var(--df-text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
@@ -201,8 +201,8 @@
     white-space: nowrap;
   }
 
-  .df-weather-status-chip--optimal { background: #ECFDF5; color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); }
-  .df-weather-status-chip--camanchaca { background: #E0F2FE; color: var(--df-sky-blue); border: 1px solid rgba(2, 132, 199, 0.3); }
+  .df-weather-status-chip--warning { background: #FEF2F2; color: #991B1B; border: 1px solid rgba(220, 38, 38, 0.3); }
+  .df-weather-status-chip--camanchaca { background: #F1F5F9; color: #475569; border: 1px solid rgba(100, 116, 139, 0.3); }
 
   /* ================= GRILLA ESPECIES ================= */
   .df-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(12px, 1.5vw, 18px); }
@@ -309,7 +309,7 @@
           <circle cx="12" cy="12" r="3"/>
           <path d="M12 2a4 4 0 0 0-4 4c0 2 2 4 4 6 2-2 4-4 4-6a4 4 0 0 0-4-4z"/>
           <path d="M12 22a4 4 0 0 0 4-4c0-2-2-4-4-6-2 2-4 4-4 6a4 4 0 0 0 4 4z"/>
-          <path d="M22 12a4 4 0 0 0-4-4c-2 0-4 2-6 4 2 2 4 4 6 4a4 4 0 0 0 4-4z"/>
+          <path d="M22 12a4 4 0 0 0-4-4c-2 0-4 2-6 4 2 2 4 4 6 4a4 4 0 0 0 4 4z"/>
           <path d="M2 12a4 4 0 0 0 4 4c2 0 4-2 6-4-2-2-4-4-6-4a4 4 0 0 0-4 4z"/>
         </svg>
       </div>
@@ -324,7 +324,7 @@
     </div>
   </div>
 
-  <!-- MINI BARRA DE MICROCLIMA -->
+  <!-- MINI BARRA DE MICROCLIMA (AJUSTADA A NOVIEMBRE) -->
   <div class="df-weather-bar">
     <div class="df-weather-metric">
       <div class="df-weather-icon-box df-weather-icon-box--fog">
@@ -334,9 +334,9 @@
       </div>
       <div class="df-weather-details">
         <span class="df-weather-label">Humedad / Camanchaca</span>
-        <div class="df-weather-value">84% <span>(Alta)</span></div>
+        <div class="df-weather-value">62% <span>(Moderada)</span></div>
       </div>
-      <span class="df-weather-status-chip df-weather-status-chip--camanchaca">Niebla Activa</span>
+      <span class="df-weather-status-chip df-weather-status-chip--camanchaca">Disipación Matinal</span>
     </div>
 
     <div class="df-weather-metric">
@@ -348,9 +348,9 @@
       </div>
       <div class="df-weather-details">
         <span class="df-weather-label">Radiación UV / Sol</span>
-        <div class="df-weather-value">Índice 8 <span>(Alto)</span></div>
+        <div class="df-weather-value">Índice 11+ <span>(Extremo)</span></div>
       </div>
-      <span class="df-weather-status-chip df-weather-status-chip--optimal">Apertura Óptima</span>
+      <span class="df-weather-status-chip df-weather-status-chip--warning">Secado de Llanos</span>
     </div>
 
     <div class="df-weather-metric">
@@ -361,7 +361,7 @@
       </div>
       <div class="df-weather-details">
         <span class="df-weather-label">Temp. / Sustrato</span>
-        <div class="df-weather-value">18.5 °C <span>(SO 12 km/h)</span></div>
+        <div class="df-weather-value">22.8 °C <span>(SSO 18 km/h)</span></div>
       </div>
     </div>
   </div>
@@ -431,7 +431,7 @@
           </div>
         </div>
         <p class="df-status-note">
-          <strong>Fase de Senescencia:</strong> Cierre del manto floral y dispersión de cápsulas de semillas en llanos.
+          <strong>Fase de Senescencia:</strong> Cierre del manto floral por alta radiación y dispersión de cápsulas de semillas en llanos.
         </p>
       </div>
     </article>
@@ -464,7 +464,6 @@
             <path d="M 138 134 C 130 112, 140 90, 150 80 C 158 94, 150 114, 146 134 Z" fill="#22C55E"/>
             <g transform="translate(168, 110)">
               <ellipse cx="-2" cy="10" rx="9" ry="5" fill="#15803D"/>
-              <!-- Inflorescencia de Garra desplegada -->
               <circle cx="-16" cy="-14" r="9" fill="#991B1B"/>
               <circle cx="14" cy="-14" r="9" fill="#991B1B"/>
               <circle cx="-10" cy="-26" r="10" fill="#BE123C"/>
@@ -485,7 +484,7 @@
           </div>
         </div>
         <p class="df-status-note">
-          <strong>Punto Máximo Registrado:</strong> Plena floración rutilante con alta densidad en laderas de quebradas costeras.
+          <strong>Punto Máximo Registrado:</strong> Plena floración rutilante favorecida por la humedad residual en laderas costeras.
         </p>
       </div>
     </article>
